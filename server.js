@@ -1,13 +1,14 @@
 // ============================================
 // SERVER.JS
-// ============================================
+// =======
+//=====================================
 
 const express = require("express"); // Corregido: "express" con doble 's'
 const path = require("path");
 const rutas = require("./routes/routes.js");
 
 const app = express(); // Agregado: "const"
-
+// module.exports = router;
 // 3. CONFIGURAR el motor de plantillas
 app.set("view engine", "ejs");
 app.set("views", "./views");
