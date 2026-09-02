@@ -1,28 +1,23 @@
-// ============================================
-// SERVER.JS
-// =======
-//=====================================
+// 1. Importar Express
+const express = require('express');
+const app = express();
+const PORT = 3000;
+const temasController = require('./controllers/temasController');
+// 2. Configurar el motor de plantillas (usaremos EJS)
+app.set('view engine', 'ejs');
+app.set('views', './views'); 
 
-const express = require("express"); // Corregido: "express" con doble 's'
-const path = require("path");
-const rutas = require("./routes/routes.js");
-
-const app = express(); // Agregado: "const"
-// module.exports = router;
-// 3. CONFIGURAR el motor de plantillas
-app.set("view engine", "ejs");
-app.set("views", "./views");
-
-// 4. MIDDLEWARES (Deben ir dentro de app.use)
-app.use(express.json());
+// 3. Preparar el servidor para entender datos (formularios y JSON)
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static("public"));
+app.use(express.json());
 
-// 5. MONTAR las rutas principales
-app.use("/", rutas); // Agregado: el manejador "rutas"
+// 4. Habilitar la carpeta "public" para tu CSS y JS del frontend
+app.use(express.static('public'));
 
-// 6. LEVANTAR el servidor
-const PORT = 3000; // Agregado: "const"
+// 5. Una ruta básica para probar que funciona
+app.get('/', temasController.obtenerTemas);
+
+// 6. Encender el servidor
 app.listen(PORT, () => {
-    console.log("Servidor levantado en http://localhost:" + PORT); // Corregido: "//" en el enlace
+    console.log(`Servidor activo. Abre en tu navegador: http://localhost:${PORT}`);
 });
