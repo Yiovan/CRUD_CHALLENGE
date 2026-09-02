@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Learn It, Love It Inc.</title>
+</head>
+<body>
+    <h1>Temas de Aprendizaje</h1>
+
+    <!-- Aquí recorremos nuestro arreglo de temas con un bucle de JavaScript -->
+    <ul>
+        <% temas.forEach(tema => { %>
+            <li>
+                <strong><%= tema.titulo %></strong> - Votos: <%= tema.votos %>
+            </li>
+        <% }) %>
+    </ul>
+    <hr>
+    <h3></h3>
+    <form action="/temas" method="post">
+        <input type="text" name="titulo" placeholder="Ej: aprender node js">
+        <button type="submit">crear tema</button>
+    </form>
+
+</body>
+</html>
