@@ -1,18 +1,13 @@
-let temas =[
-    {
-        id:1,
-        titulo: "como programar como un ninja",
-        votos: 5,
-        enlaces: [
-            {id: 1, url: "https://developer.mozilla.org", votos: 2}
-        ]
-    },
-    {
-        id:1,
-        titulo: "como programar como un ninja",
-        votos: 5,
-        enlaces: []
-    }
-];
+const pool = require('./db')
+const obtenerTodos = async ()=> {
+    const resultado = await pool.query('SELECT * FROM temas BY votos DESC');
+    return resultado.rows;
+};
+    
+const crear = async(titulo) => {
+    await pool.query('INSERT INTO temas (titulo, votos) VALUES ($1, $2)', [titulo, 0]);
+}
 
-module.exports = temas;
+module.exports = { obtenerTodos, crear }
+
+
