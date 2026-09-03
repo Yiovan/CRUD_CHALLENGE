@@ -82,104 +82,127 @@
         </div>
 
         <!-- ── Lista de temas ── -->
-        <div class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl shadow-indigo-100/50 border border-white p-6 mb-5 animate-fade-in">
+        <!-- Lista de temas -->
+<div class="bg-white rounded-2xl shadow-md p-6 mb-6">
+    <h2 class="text-xl font-bold text-gray-700 mb-4 flex items-center gap-2">
+        <span class="material-icons-round text-indigo-500">menu_book</span>
+        Temas de Aprendizaje
+    </h2>
 
-            <div class="flex items-center justify-between mb-5">
-                <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
-                    <span class="material-icons-round text-indigo-500 text-xl">menu_book</span>
-                    Temas de Aprendizaje
-                </h2>
-                <% if (temas.length > 0) { %>
-                <span class="text-xs text-gray-400 font-medium">ordenado por votos ↓</span>
-                <% } %>
-            </div>
-
-            <% if (temas.length === 0) { %>
-                <!-- Estado vacío -->
-                <div class="flex flex-col items-center justify-center py-14 text-center">
-                    <div class="w-16 h-16 rounded-2xl bg-indigo-50 flex items-center justify-center mb-4">
-                        <span class="material-icons-round text-indigo-300 text-3xl">inbox</span>
+    <% if (temas.length === 0) { %>
+        <p class="text-center text-gray-400 py-8">Todavía no hay temas. ¡Agregá el primero!</p>
+    <% } else { %>
+        <ul class="space-y-4">
+            <% temas.forEach((tema, index) => { %>
+                <li class="p-4 bg-gray-50 border border-gray-100 rounded-xl hover:border-indigo-200 transition-all duration-200">
+                    
+                    <!-- Cabecera del Tema -->
+                    <div class="flex justify-between items-center gap-4">
+                        <div class="flex items-center gap-3 flex-1">
+                            <span class="text-xs font-bold text-gray-400 w-5 text-right"><%= index + 1 %>.</span>
+                            <span id="tema-display-<%= tema.id %>" class="text-lg text-gray-800"><%= tema.titulo %></span>
+                            <form id="tema-form-<%= tema.id %>" class="hidden flex-1">
+                                <input
+                                    id="tema-input-<%= tema.id %>"
+                                    type="text"
+                                    value="<%= tema.titulo %>"
+                                    class="flex-1 border border-gray-300 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:border-indigo-500"
+                                >
+                                <button type="button" onclick="guardarTema(<%= tema.id %>)" class="ml-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-1.5 rounded-md transition">
+                                    Guardar
+                                </button>
+                                <button type="button" onclick="toggleEditarTema(<%= tema.id %>)" class="ml-1 text-gray-500 hover:text-gray-700 text-xs font-bold px-2 py-1.5">
+                                    Cancelar
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <div class="flex items-center gap-2">
+                            <span class="bg-indigo-100 text-indigo-700 text-sm font-semibold px-3 py-1 rounded-full whitespace-nowrap flex items-center gap-1">
+                                <span class="material-icons-round text-base">how_to_vote</span>
+                                <%= tema.votos %> votos
+                            </span>
+                            
+                            <button onclick="toggleEditarTema(<%= tema.id %>)" class="flex items-center justify-center p-2 bg-amber-100 text-amber-600 hover:bg-amber-500 hover:text-white rounded-lg transition-colors cursor-pointer" title="Editar Tema">
+                                <span class="material-icons-round text-lg">edit</span>
+                            </button>
+                            
+                            <button onclick="votarTema(<%= tema.id %>)" class="flex items-center justify-center p-2 bg-green-100 text-green-600 hover:bg-green-500 hover:text-white rounded-lg transition-colors cursor-pointer" title="Votar Tema">
+                                <span class="material-icons-round text-lg">thumb_up</span>
+                            </button>
+                            
+                            <button onclick="eliminarTema(<%= tema.id %>)" class="flex items-center justify-center p-2 bg-red-100 text-red-600 hover:bg-red-500 hover:text-white rounded-lg transition-colors cursor-pointer" title="Eliminar Tema">
+                                <span class="material-icons-round text-lg">delete</span>
+                            </button>
+                        </div>
                     </div>
-                    <p class="text-gray-500 font-semibold">Todavía no hay temas</p>
-                    <p class="text-gray-400 text-sm mt-1">¡Agregá el primero usando el formulario de abajo!</p>
-                </div>
-            <% } else { %>
-                <%
-                    // Ordenar por votos para calcular el máximo (los temas ya vienen del server)
-                    const maxVotos = Math.max(...temas.map(t => t.votos), 1);
-                    const medals   = ['🥇', '🥈', '🥉'];
-                    // Crear copia ordenada por votos para asignar ranking
-                    const ranked = [...temas].sort((a, b) => b.votos - a.votos);
-                    const rankMap = {};
-                    ranked.forEach((t, i) => { if (rankMap[t.id] === undefined) rankMap[t.id] = i; });
-                %>
-                <ul class="space-y-3">
-                    <% temas.forEach((tema) => {
-                        const rank = rankMap[tema.id];
-                        const medal = medals[rank] || null;
-                        const pct   = Math.round((tema.votos / maxVotos) * 100);
-                        const isTop = rank < 3 && tema.votos > 0;
-                    %>
-                    <li class="item-card group flex flex-col p-4 rounded-2xl border transition-all duration-200 cursor-default animate-fade-in
-                        <%= isTop && rank === 0 ? 'bg-amber-50   border-amber-200   hover:border-amber-300'   :
-                           isTop && rank === 1 ? 'bg-slate-50   border-slate-200   hover:border-slate-300'   :
-                           isTop && rank === 2 ? 'bg-orange-50  border-orange-200  hover:border-orange-300'  :
-                                                 'bg-gray-50    border-gray-100    hover:bg-indigo-50 hover:border-indigo-200' %>">
 
-                        <div class="flex items-center justify-between gap-3">
-                            <!-- Izquierda: medalla/número + título -->
-                            <div class="flex items-center gap-3 flex-1 min-w-0">
-                                <% if (medal && tema.votos > 0) { %>
-                                    <span class="text-xl leading-none flex-shrink-0"><%= medal %></span>
-                                <% } else { %>
-                                    <span class="text-xs font-bold text-gray-300 w-5 text-right flex-shrink-0"><%= temas.indexOf(tema) + 1 %>.</span>
-                                <% } %>
-                                <span class="font-semibold text-gray-800 truncate"><%= tema.titulo %></span>
-                            </div>
+                    <!-- Sección de Enlaces -->
+                    <div class="mt-4 pl-8 border-t border-gray-200 pt-3">
+                        <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Enlaces útiles:</p>
+                        
+                        <ul class="space-y-2 mb-3">
+                            <% if (tema.enlaces && tema.enlaces.length > 0) { %>
+                                <% tema.enlaces.forEach(enlace => { %>
+                                    <li class="flex justify-between items-center bg-white p-2 px-3 border border-gray-200 rounded-lg text-sm">
+                                        <span id="enlace-display-<%= enlace.id %>" class="truncate max-w-xs sm:max-w-md">
+                                            <a href="<%= enlace.url %>" target="_blank" class="text-indigo-600 hover:underline truncate"><%= enlace.url %></a>
+                                        </span>
+                                        <form id="enlace-form-<%= enlace.id %>" class="hidden flex-1">
+                                            <input
+                                                id="enlace-input-<%= enlace.id %>"
+                                                type="url"
+                                                value="<%= enlace.url %>"
+                                                class="flex-1 border border-gray-300 rounded-md px-2 py-1 text-xs focus:outline-none focus:border-indigo-500"
+                                            >
+                                            <button type="button" onclick="guardarEnlace(<%= enlace.id %>)" class="ml-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-2 py-1 rounded-md transition">
+                                                Guardar
+                                            </button>
+                                            <button type="button" onclick="toggleEditarEnlace(<%= enlace.id %>)" class="ml-1 text-gray-500 hover:text-gray-700 text-xs font-bold px-2 py-1">
+                                                Cancelar
+                                            </button>
+                                        </form>
+                                        
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-xs text-gray-500 font-semibold"><%= enlace.votos %> votos</span>
+                                            <button onclick="toggleEditarEnlace(<%= enlace.id %>)" class="text-amber-600 hover:text-amber-800 p-1" title="Editar Enlace">
+                                                <span class="material-icons-round text-sm">edit</span>
+                                            </button>
+                                            <button onclick="votarEnlace(<%= enlace.id %>)" class="text-green-600 hover:text-green-800 p-1" title="Votar Enlace">
+                                                <span class="material-icons-round text-sm">thumb_up</span>
+                                            </button>
+                                            <button onclick="eliminarEnlace(<%= enlace.id %>)" class="text-red-600 hover:text-red-800 p-1" title="Eliminar Enlace">
+                                                <span class="material-icons-round text-sm">delete</span>
+                                            </button>
+                                        </div>
+                                    </li>
+                                <% }) %>
+                            <% } else { %>
+                                <p class="text-xs text-gray-400 italic">No hay enlaces todavía.</p>
+                            <% } %>
+                        </ul>
 
-                            <!-- Derecha: badge de votos + botones -->
-                            <div class="flex items-center gap-2 flex-shrink-0 item-actions">
-                                <span class="hidden sm:inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full
-                                    <%= tema.votos > 0 ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-100 text-gray-400' %>">
-                                    <span class="material-icons-round text-xs">how_to_vote</span>
-                                    <%= tema.votos %>
-                                </span>
+                        <!-- Formulario para agregar enlace -->
+                        <form onsubmit="agregarEnlace(event, <%= tema.id %>)" class="flex gap-2">
+                            <input 
+                                id="enlace-nuevo-<%= tema.id %>"
+                                type="url" 
+                                name="url" 
+                                placeholder="https://ejemplo.com" 
+                                required
+                                class="flex-1 text-xs border border-gray-300 rounded-md px-3 py-1.5 focus:outline-none focus:border-indigo-500"
+                            >
+                            <button type="submit" class="bg-gray-800 hover:bg-indigo-600 text-white text-xs font-bold px-3 py-1.5 rounded-md transition">
+                                Agregar Enlace
+                            </button>
+                        </form>
+                    </div>
 
-                                <!-- Votar -->
-                                <button
-                                    onclick="votarTema(<%= tema.id %>, this)"
-                                    class="flex items-center justify-center w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white active:scale-95 transition-all duration-150 shadow-sm"
-                                    title="Votar">
-                                    <span class="material-icons-round text-lg">thumb_up</span>
-                                </button>
-
-                                <!-- Eliminar -->
-                                <button
-                                    onclick="eliminarTema(<%= tema.id %>, this)"
-                                    class="flex items-center justify-center w-9 h-9 rounded-xl bg-red-50 text-red-400 hover:bg-red-500 hover:text-white active:scale-95 transition-all duration-150 shadow-sm"
-                                    title="Eliminar">
-                                    <span class="material-icons-round text-lg">delete</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Barra de progreso -->
-                        <% if (tema.votos > 0) { %>
-                        <div class="mt-3 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                            <div class="progress-bar h-full rounded-full
-                                <%= rank === 0 ? 'bg-gradient-to-r from-amber-400 to-yellow-300' :
-                                   rank === 1 ? 'bg-gradient-to-r from-slate-400 to-slate-300'  :
-                                   rank === 2 ? 'bg-gradient-to-r from-orange-400 to-amber-300' :
-                                                'bg-gradient-to-r from-indigo-400 to-purple-400' %>"
-                                 style="width: <%= pct %>%">
-                            </div>
-                        </div>
-                        <% } %>
-                    </li>
-                    <% }) %>
-                </ul>
-            <% } %>
-        </div>
+                </li>
+            <% }) %>
+        </ul>
+    <% } %>
+</div>
 
         <!-- ── Formulario ── -->
         <div class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl shadow-indigo-100/50 border border-white p-6 animate-fade-in" style="animation-delay:0.15s">

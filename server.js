@@ -19,6 +19,14 @@ app.use(express.static('public'));
 app.get('/', temasController.obtenerTemas);
 // Ruta para crear un tema (usa POST porque estamos enviando datos)
 app.post('/temas', temasController.crearTema);
+app.put('/temas/:id/votar', temasController.votarTema);
+app.put('/temas/:id', temasController.actualizarTema);
+app.delete('/temas/:id', temasController.eliminarTema);
+// Rutas para Enlaces
+app.post('/temas/:id/enlaces', temasController.crearEnlace);
+app.put('/enlaces/:id/votar', temasController.votarEnlace);
+app.put('/enlaces/:id', temasController.actualizarEnlace);
+app.delete('/enlaces/:id', temasController.eliminarEnlace);
 // 6. Encender el servidor
 inicializarDB().then(() => {
     app.listen(PORT, () => {

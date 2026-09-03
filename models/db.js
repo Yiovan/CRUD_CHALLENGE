@@ -17,8 +17,16 @@ const inicializarDB = async ()=> {
             votos INTEGER DEFAULT 0
         );
     `);
-    console.log("base de datos lista y creada correctamente")
+    
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS enlaces (
+            id SERIAL PRIMARY KEY,
+            tema_id INTEGER REFERENCES temas(id) on DELETE CASCADE,
+            url VARCHAR(255) NOT NULL,
+            votos INTEGER DEFAULT 0
+        );
+    `);
+        console.log("base de datos conectada y tablas listas")
 }
-
 
 module.exports = { pool, inicializarDB };

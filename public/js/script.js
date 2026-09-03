@@ -28,71 +28,154 @@ function showToast(message, type = 'success') {
     }, 2800);
 }
 
-// ── Votar ────────────────────────────────────────────────────────────────────
-async function votarTema(id, btn) {
-    btn.disabled = true;
-    btn.classList.add('opacity-50', 'cursor-not-allowed');
-
+// ── Votar Tema ──────────────────────────────────────────────────────────────
+async function votarTema(id) {
     try {
-        const res = await fetch(`/temas/${id}/votar`, { method: 'POST' });
-
+        const res = await fetch(`/temas/${id}/votar`, { method: 'PUT' });
         if (res.ok) {
-            // Animación de pulso en el item padre
-            const item = btn.closest('li');
-            if (item) {
-                item.classList.add('animate-pulse-once');
-                item.addEventListener('animationend', () => item.classList.remove('animate-pulse-once'), { once: true });
-            }
-            showToast('¡Voto registrado! 🎉', 'success');
+            showToast('¡Voto registrado!', 'success');
             setTimeout(() => location.reload(), 600);
         } else {
             throw new Error('Error al votar');
         }
     } catch (e) {
         showToast('No se pudo registrar el voto.', 'error');
-        btn.disabled = false;
-        btn.classList.remove('opacity-50', 'cursor-not-allowed');
     }
 }
 
-// ── Eliminar ─────────────────────────────────────────────────────────────────
-async function eliminarTema(id, btn) {
-    const item = btn.closest('li');
-
-    // Confirmar con un toast visual (simple confirm nativo como fallback)
+// ── Eliminar Tema ───────────────────────────────────────────────────────────
+async function eliminarTema(id) {
     if (!confirm('¿Eliminar este tema?')) return;
-
-    btn.disabled = true;
 
     try {
         const res = await fetch(`/temas/${id}`, { method: 'DELETE' });
-
         if (res.ok) {
-            // Animar salida del item
-            if (item) {
-                item.style.transition = 'all 0.3s ease';
-                item.style.opacity    = '0';
-                item.style.transform  = 'translateX(30px)';
-                item.style.maxHeight  = item.offsetHeight + 'px';
-                setTimeout(() => {
-                    item.style.maxHeight = '0';
-                    item.style.padding   = '0';
-                    item.style.margin    = '0';
-                    item.style.overflow  = 'hidden';
-                }, 300);
-                setTimeout(() => {
-                    item.remove();
-                    // Actualizar contador si queda vacía la lista
-                    const lista = document.querySelector('ul');
-                    if (lista && lista.children.length === 0) location.reload();
-                }, 600);
-            }
             showToast('Tema eliminado.', 'info');
+            setTimeout(() => location.reload(), 600);
         } else {
             throw new Error('Error al eliminar');
         }
     } catch (e) {
         showToast('No se pudo eliminar el tema.', 'error');
-        btn.disabled = false;
+    }
+}
+
+// ── Editar Tema ─────────────────────────────────────────────────────────────
+function toggleEditarTema(id) {
+    const display = document.getElementById(`tema-display-${id}`);
+    const form = document.getElementById(`tema-form-${id}`);
+    if (display && form) {
+        display.classList.toggle('hidden');
+        form.classList.toggle('hidden');
+    }
+}
+
+async function guardarTema(id) {
+    const input = document.getElementById(`tema-input-${id}`);
+    const titulo = input.value.trim();
+    if (!titulo) return;
+
+    try {
+        const res = await fetch(`/temas/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ titulo })
+        });
+        if (res.ok) {
+            showToast('Tema actualizado.', 'success');
+            setTimeout(() => location.reload(), 600);
+        } else {
+            throw new Error('Error al actualizar');
+        }
+    } catch (e) {
+        showToast('No se pudo actualizar el tema.', 'error');
+    }
+}
+
+// ── Agregar Enlace (AJAX) ──────────────────────────────────────────────────
+async function agregarEnlace(event, temaId) {
+    event.preventDefault();
+    const input = document.getElementById(`enlace-nuevo-${temaId}`);
+    const url = input.value.trim();
+    if (!url) return;
+
+    try {
+        const res = await fetch(`/temas/${temaId}/enlaces`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url })
+        });
+        if (res.ok) {
+            showToast('Enlace agregado.', 'success');
+            setTimeout(() => location.reload(), 600);
+        } else {
+            throw new Error('Error al agregar enlace');
+        }
+    } catch (e) {
+        showToast('No se pudo agregar el enlace.', 'error');
+    }
+}
+
+// ── Votar Enlace ────────────────────────────────────────────────────────────
+async function votarEnlace(id) {
+    try {
+        const res = await fetch(`/enlaces/${id}/votar`, { method: 'PUT' });
+        if (res.ok) {
+            showToast('¡Voto de enlace registrado!', 'success');
+            setTimeout(() => location.reload(), 600);
+        } else {
+            throw new Error('Error al votar enlace');
+        }
+    } catch (e) {
+        showToast('No se pudo registrar el voto.', 'error');
+    }
+}
+
+// ── Eliminar Enlace ─────────────────────────────────────────────────────────
+async function eliminarEnlace(id) {
+    if (!confirm('¿Eliminar este enlace?')) return;
+
+    try {
+        const res = await fetch(`/enlaces/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+            showToast('Enlace eliminado.', 'info');
+            setTimeout(() => location.reload(), 600);
+        } else {
+            throw new Error('Error al eliminar enlace');
+        }
+    } catch (e) {
+        showToast('No se pudo eliminar el enlace.', 'error');
+    }
+}
+
+// ── Editar Enlace ───────────────────────────────────────────────────────────
+function toggleEditarEnlace(id) {
+    const display = document.getElementById(`enlace-display-${id}`);
+    const form = document.getElementById(`enlace-form-${id}`);
+    if (display && form) {
+        display.classList.toggle('hidden');
+        form.classList.toggle('hidden');
+    }
+}
+
+async function guardarEnlace(id) {
+    const input = document.getElementById(`enlace-input-${id}`);
+    const url = input.value.trim();
+    if (!url) return;
+
+    try {
+        const res = await fetch(`/enlaces/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url })
+        });
+        if (res.ok) {
+            showToast('Enlace actualizado.', 'success');
+            setTimeout(() => location.reload(), 600);
+        } else {
+            throw new Error('Error al actualizar enlace');
+        }
+    } catch (e) {
+        showToast('No se pudo actualizar el enlace.', 'error');
     }
 }
