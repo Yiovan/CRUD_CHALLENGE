@@ -3,6 +3,7 @@ const express = require('express');
 const app = express();
 const PORT = 3000;
 const temasController = require('./controllers/temasController');
+const { inicializarDB } = require('./models/db');
 // 2. Configurar el motor de plantillas (usaremos EJS)
 app.set('view engine', 'ejs');
 app.set('views', './views'); 
@@ -19,6 +20,8 @@ app.get('/', temasController.obtenerTemas);
 // Ruta para crear un tema (usa POST porque estamos enviando datos)
 app.post('/temas', temasController.crearTema);
 // 6. Encender el servidor
-app.listen(PORT, () => {
-    console.log(`Servidor activo. Abre en tu navegador: http://localhost:${PORT}`);
+inicializarDB().then(() => {
+    app.listen(PORT, () => {
+        console.log(`Servidor activo. Abre en tu navegador: http://localhost:${PORT}`);
+    });
 });

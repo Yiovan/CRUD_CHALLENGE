@@ -19,3 +19,6 @@ const inicializarDB = async ()=> {
     `);
     console.log("base de datos lista y creada correctamente")
 }
+
+
+module.exports = { pool, inicializarDB };
