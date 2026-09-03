@@ -16,7 +16,8 @@ app.use(express.static('public'));
 
 // 5. Una ruta básica para probar que funciona
 app.get('/', temasController.obtenerTemas);
-
+// Ruta para crear un tema (usa POST porque estamos enviando datos)
+app.post('/temas', temasController.crearTema);
 // 6. Encender el servidor
 app.listen(PORT, () => {
     console.log(`Servidor activo. Abre en tu navegador: http://localhost:${PORT}`);
