@@ -72,6 +72,7 @@ function toggleEditarTema(id) {
 
 async function guardarTema(id) {
     const input = document.getElementById(`tema-input-${id}`);
+    // busca un elemento con id dinamico 
     const titulo = input.value.trim();
     if (!titulo) return;
 
@@ -79,16 +80,16 @@ async function guardarTema(id) {
         const res = await fetch(`/temas/${id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ titulo })
+            body: JSON.stringify({ titulo }) // convierte un objeto en un string 
         });
         if (res.ok) {
             showToast('Tema actualizado.', 'success');
-            setTimeout(() => location.reload(), 600);
+            setTimeout(() => location.reload(), 600); // recarga la pagina despues de 0.6 segundos ms 
         } else {
             throw new Error('Error al actualizar');
         }
     } catch (e) {
-        showToast('No se pudo actualizar el tema.', 'error');
+        showToast('No se pudo actualizar el tema.', 'error'); // deja una notificacion en el recuadro
     }
 }
 
